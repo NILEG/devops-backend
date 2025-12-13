@@ -16,6 +16,11 @@ spec:
     volumeMounts:
       - mountPath: /var/run/docker.sock
         name: docker-sock
+  # NEW: Add this container for kubectl
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command: ['cat']
+    tty: true
   volumes:
   - name: docker-sock
     hostPath:
@@ -62,11 +67,9 @@ spec:
         
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    sh """
-                        kubectl set image deployment/backend backend=${DOCKER_IMAGE}:${DOCKER_TAG} -n todo-app
-                        kubectl rollout status deployment/backend -n todo-app
-                    """
+                container('kubectl') {
+                    // Update the image version to match what you pushed (e.g., :1)
+                    sh 'kubectl set image deployment/backend backend=umair1987/todo-backend:1 -n todo-app'
                 }
             }
         }
