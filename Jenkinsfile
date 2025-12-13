@@ -10,7 +10,7 @@ spec:
     image: jenkins/inbound-agent:3345.v03dee9b_f88fc-6
     args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
   - name: docker-tools
-    image: docker:24.0.0-cli
+    image: docker:27.2.0-cli
     command: ['cat']
     tty: true
     volumeMounts:
