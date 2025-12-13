@@ -49,10 +49,12 @@ spec:
         
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        docker.image("${DOCKER_IMAGE}:latest").push()
+                container('docker-tools') {
+                    script {
+                        // Replace 'docker-credentials-id' with the actual ID from your Jenkins credentials
+                        withDockerRegistry(credentialsId: 'dockerhub-credentials', url: 'https://index.docker.io/v1/') {
+                            sh 'docker push umair1987/todo-backend:1'
+                        }
                     }
                 }
             }
