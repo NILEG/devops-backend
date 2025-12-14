@@ -3,6 +3,7 @@ pipeline {
     // REPLACE THIS with your actual DockerHub username
     dockerimagename = "umair1987/express-backend"
     dockerImage = ""
+    kubeconfigId = 'minikube-kubeconfig'
   }
   agent any
   stages {
@@ -29,9 +30,10 @@ pipeline {
     }
     stage('Deploying to Kubernetes') {
       steps {
-        script {
-          // Deploy both the deployment and service files
-          kubernetesDeploy(configs: 'deployment.yaml, service.yaml')
+        // This step wraps your commands with the credentials you uploaded
+        withKubeConfig([credentialsId: kubeconfigId]) {
+           sh 'kubectl apply -f deployment.yaml'
+           sh 'kubectl apply -f service.yaml'
         }
       }
     }
