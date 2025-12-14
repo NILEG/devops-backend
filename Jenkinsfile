@@ -6,12 +6,7 @@ pipeline {
   }
   agent any
   stages {
-    stage('Checkout Source') {
-      steps {
-        // REPLACE THIS with your GitHub Repository URL
-        git 'https://github.com/NILEG/devops-backend.git'
-      }
-    }
+    
     stage('Build image') {
       steps{
         script {
