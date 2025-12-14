@@ -1,32 +1,35 @@
 import express from "express";
 import PocketBase from "pocketbase";
+import pb from "../config/pocketbase.js"; // Change this line
 
 const router = express.Router();
-const pb = new PocketBase(
-  process.env.POCKETBASE_URL || "http://localhost:8090"
-);
 
 // Middleware to verify authentication
 const authenticate = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
+
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
     }
 
     pb.authStore.save(token);
 
-    if (!pb.authStore.isValid) {
-      return res.status(401).json({ message: "Invalid token" });
+    // Verify the token by refreshing auth
+    try {
+      const authData = await pb.collection("users").authRefresh();
+      req.userId = authData.record.id;
+      next();
+    } catch (err) {
+      console.error("Token verification failed:", err);
+      pb.authStore.clear();
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
-
-    req.userId = pb.authStore.model.id;
-    next();
   } catch (error) {
+    console.error("Authentication error:", error);
     res.status(401).json({ message: "Authentication failed" });
   }
 };
-
 // Get all todos for authenticated user
 router.get("/", authenticate, async (req, res) => {
   try {

@@ -1,10 +1,8 @@
 import express from "express";
 import PocketBase from "pocketbase";
+import pb from "../config/pocketbase.js";
 
 const router = express.Router();
-const pb = new PocketBase(
-  process.env.POCKETBASE_URL || "http://localhost:8090"
-);
 
 // Register
 router.post("/register", async (req, res) => {
